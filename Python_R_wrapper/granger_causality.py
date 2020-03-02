@@ -23,6 +23,7 @@ pandas2ri.activate()
         
 
 def granger_causality(data,cols,y_var,lags,our_type):
+    data = pd.read_csv(data)
     y_subset = data[y_var]
     pandas2ri.activate()
     #data = pandas2ri.ri2py(data)
