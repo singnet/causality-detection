@@ -1,4 +1,4 @@
-# Climate causality
+# Causality detection
 
 This is a project regarding climate causality research. Relevant code can be found here.
 
