@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message CausalityDetectionRequest {
+    string input = 1;
+    string model = 2;
+    int32 scale = 3;
+}
+
+message Image {
+    string data = 1;
+}
+
+service CausalityDetection {
+    rpc detect_causality (CausalityDetectionRequest) returns (Image);
+}
