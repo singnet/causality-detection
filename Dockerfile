@@ -4,21 +4,23 @@ FROM pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-runtime
 ARG git_owner
 ARG git_repo
 ARG git_branch
+
 ENV SINGNET_REPOS=/opt/singnet
 ENV PROJECT_ROOT=${SINGNET_REPOS}/${git_repo}
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Updating and installing common dependencies
 RUN apt-get update && \
+    apt upgrade -y && \
     apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
+    sudo \
     git \
+    gedit \
     wget \
     nano \
-    unzip && \
-    pip install --upgrade pip
+    unzip \
+    r-base \
+    python3-pip
 
 # Installing snet-daemon + dependencies
 RUN SNETD_VERSION=`curl -s https://api.github.com/repos/singnet/snet-daemon/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")'` && \
