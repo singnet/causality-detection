@@ -1,5 +1,5 @@
 ## Create container using nvidia-docker and add shared memory size argument
-FROM pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-runtime
+FROM ubuntu:18.04
 
 ARG git_owner
 ARG git_repo
