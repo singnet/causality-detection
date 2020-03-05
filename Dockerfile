@@ -20,7 +20,8 @@ RUN apt-get update && \
     nano \
     unzip \
     r-base \
-    python3-pip
+    python3-pip && \
+    pip3 install --upgrade pip
 
 # Installing snet-daemon + dependencies
 RUN cd /tmp && \
