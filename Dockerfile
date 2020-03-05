@@ -25,8 +25,8 @@ RUN apt-get update && \
 # Installing snet-daemon + dependencies
 RUN cd /tmp && \
     wget https://github.com/singnet/snet-daemon/releases/download/v3.1.0/snet-daemon-v3.1.0-linux-amd64.tar.gz && \
-    tar -xvf snet-daemon-${SNETD_VERSION}-linux-amd64.tar.gz && \
-    mv snet-daemon-${SNETD_VERSION}-linux-amd64/snetd /usr/bin/snetd
+    tar -xvf snet-daemon-v3.1.0-linux-amd64.tar.gz && \
+    mv snet-daemon-v3.1.0-linux-amd64/snetd /usr/bin/snetd
 
 # Cloning service repository
 RUN mkdir -p ${SINGNET_REPOS} && \
