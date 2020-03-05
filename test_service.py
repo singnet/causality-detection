@@ -4,7 +4,9 @@ import grpc
 import service.service_spec.causality_detection_pb2_grpc as grpc_bt_grpc
 import service.service_spec.causality_detection_pb2 as grpc_bt_pb2
 
-from service import registry, base64_to_jpg, clear_file
+from service import registry
+import pandas as pd
+import io
 
 if __name__ == "__main__":
 
@@ -16,29 +18,36 @@ if __name__ == "__main__":
 
         # setting parameters
         grpc_method = "detect_causality"
-        input_image = \
-            "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
-        model = "proSR"
-        scale = 5
+
+        data = pd.read_csv('./natural_data2.csv').to_csv()
+        start = ""
+        end = ""
+        input_features = "Ozone, WMGHG"
+        output_feature = "Temperature"
+        lags = 3
+        modelling_type = ""
 
         # create a stub (client)
         stub = grpc_bt_grpc.CausalityDetectionStub(channel)
         print("Stub created.")
 
         # create a valid request message
-        request = grpc_bt_pb2.CausalityDetectionRequest(input=input_image,
-                                                        model=model,
-                                                        scale=scale)
+        request = grpc_bt_pb2.CausalityDetectionRequest(data=data,
+                                                        start=start,
+                                                        end=end,
+                                                        input_features=input_features,
+                                                        output_feature=output_feature,
+                                                        lags=lags,
+                                                        modelling_type=modelling_type)
         # make the call
-        response = stub.detect_causality(request)
+        output = stub.detect_causality(request)
         print("Response received!")
 
         # et voilà
-        output_file_path = "./causality_detection_test_output.jpg"
-        if response.data:
-            base64_to_jpg(response.data, output_file_path)
-            clear_file(output_file_path)
+        if output.response:
+            print('Received: {}'.format(output.response))
             print("Service completed!")
+            exit(0)
         else:
             print("Service failed! No data received.")
             exit(1)

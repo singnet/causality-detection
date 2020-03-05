@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 message CausalityDetectionRequest {
-    string csv_data = 1;
-    int32 from_index = 2;
-    int32 to_index = 3;
+    string data = 1;
+    string start = 2;
+    string end = 3;
     string input_features = 4;
     string output_feature = 5;
     int32 lags = 6;
@@ -11,8 +11,7 @@ message CausalityDetectionRequest {
 }
 
 message Result {
-    string data = 1;
-    string message = 2;
+    string response = 1;
 }
 
 service CausalityDetection {
