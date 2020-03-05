@@ -139,7 +139,7 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
 
         return image_path, model_path, file_index_str
 
-    def increase_image_resolution(self, request, context):
+    def detect_causality(self, request, context):
         """Increases the resolution of a given image (request.image) """
 
         # Store the names of the images to delete them afterwards

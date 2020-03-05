@@ -6,7 +6,6 @@ ARG git_repo
 ARG git_branch
 ENV SINGNET_REPOS=/opt/singnet
 ENV PROJECT_ROOT=${SINGNET_REPOS}/${git_repo}
-ENV MODEL_PATH=${PROJECT_ROOT}/service/models
 
 # Updating and installing common dependencies
 RUN apt-get update && \
@@ -28,12 +27,10 @@ RUN SNETD_VERSION=`curl -s https://api.github.com/repos/singnet/snet-daemon/rele
     tar -xvf snet-daemon-${SNETD_VERSION}-linux-amd64.tar.gz && \
     mv snet-daemon-${SNETD_VERSION}-linux-amd64/snetd /usr/bin/snetd
 
-# Cloning service repository and downloading models
+# Cloning service repository
 RUN mkdir -p ${SINGNET_REPOS} && \
     cd ${SINGNET_REPOS} &&\
-    git clone -b ${git_branch} --single-branch https://github.com/${git_owner}/${git_repo}.git &&\
-    cd ${MODEL_PATH} &&\
-    wget --no-check-certificate https://snet-models.s3.amazonaws.com/bh/PreTrainedDNNModels/RRDB_ESRGAN_x4.pth
+    git clone -b ${git_branch} --single-branch https://github.com/${git_owner}/${git_repo}.git
 
 # Installing projects's original dependencies and building protobuf messages
 RUN cd ${PROJECT_ROOT} &&\

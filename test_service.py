@@ -15,7 +15,7 @@ if __name__ == "__main__":
         print("Opened channel")
 
         # setting parameters
-        grpc_method = "increase_image_resolution"
+        grpc_method = "detect_causality"
         input_image = \
             "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
         model = "proSR"
@@ -30,7 +30,7 @@ if __name__ == "__main__":
                                                         model=model,
                                                         scale=scale)
         # make the call
-        response = stub.increase_image_resolution(request)
+        response = stub.detect_causality(request)
         print("Response received!")
 
         # et voilà
