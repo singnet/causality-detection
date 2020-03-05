@@ -2,16 +2,16 @@ import logging
 import grpc
 import service
 import service.service_spec.causality_detection_pb2_grpc as grpc_bt_grpc
-# from service.service_spec.causality_detection_pb2 import Image
+from service.service_spec.causality_detection_pb2 import Result
 import concurrent.futures as futures
 import sys
 import os
 from urllib.error import HTTPError
-import cv2
-import numpy as np
-import torch
-import service.RRDBNet_arch as arch
 from multiprocessing import Pool
+from granger_causality import granger_causality
+import pandas as pd
+import numpy as np
+
 
 logging.basicConfig(
     level=10, format="%(asctime)s - [%(levelname)8s] - %(name)s - %(message)s"
@@ -19,27 +19,13 @@ logging.basicConfig(
 log = logging.getLogger("causality_detection_service")
 
 
-def _increase_image_resolution(model_path, image_path):
-    log.debug('Model path {:s}. \nImage path {:s}. \nIncreasing Resolution...'.format(model_path, image_path))
+def _detect_causality():
+    log.debug('Detecting causality')
 
-    device = torch.device('cuda')  # To run on GPU
-    model = arch.RRDBNet(3, 3, 64, 23, gc=32)
-    model.load_state_dict(torch.load(model_path), strict=True)
-    model.eval()
-    model = model.to(device)
-
-    # Read and process image
     try:
-        img = cv2.imread(image_path, cv2.IMREAD_COLOR)
-        img = img * 1.0 / 255
-        img = torch.from_numpy(np.transpose(img[:, :, [2, 1, 0]], (2, 0, 1))).float()
-        img_lr = img.unsqueeze(0)
-        img_lr = img_lr.to(device)
-
-        with torch.no_grad():
-            output = model(img_lr).data.squeeze().float().cpu().clamp_(0, 1).numpy()
-        output = np.transpose(output[[2, 1, 0], :, :], (1, 2, 0))
-        output = (output * 255.0).round()
+        data = pd.read_csv("natural_data2.csv")
+        data = data[np.where(data['Year'] == 1880)[0][0]:]
+        output = granger_causality(data, ['Ozone', 'WMGHG'], 'Temperature', lags=3, our_type='trend')
         return output
     except Exception as e:
         raise e
@@ -52,22 +38,13 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
     def __init__(self):
         log.debug("CausalityDetectionServicer created!")
         
-        self.result = Image()
+        self.result = Result()
 
         self.root_path = os.getcwd()
         self.input_dir = self.root_path + "/service/temp/input"
-        self.output_dir = self.root_path + "/service/temp/output"
-        service.initialize_diretories([self.input_dir, self.output_dir])
+        service.initialize_diretories([self.input_dir])
 
-        self.model_dir = self.root_path + "/service/models"
-        self.esrgan_model = "/RRDB_ESRGAN_x"
-        self.scale_dict = {"ESRGAN": [4]}
-        self.model_suffix = ".pth"
-        if not os.path.exists(self.model_dir):
-            log.error("Models folder ({}) not found.".format(self.model_dir))
-            return
-
-    def treat_inputs(self, request, arguments, created_images):
+    def treat_inputs(self, request, arguments):
         """Treats gRPC inputs and assembles lua command. Specifically, checks if required field have been specified,
         if the values and types are correct and, for each input/input_type adds the argument to the lua command."""
 
@@ -140,19 +117,20 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
         return image_path, model_path, file_index_str
 
     def detect_causality(self, request, context):
-        """Increases the resolution of a given image (request.image) """
-
-        # Store the names of the images to delete them afterwards
-        created_images = []
+        """Evaluates causality using time series"""
 
         # Python command call arguments. Key = argument name, value = tuple(type, required?, default_value)
-        arguments = {"input": ("image", True, None),
-                     "model": ("string", True, None),
-                     "scale": ("int", False, 4)}
+        arguments = {"csv_data": ("string", True, None),
+                     "from_index": ("int", False, None),
+                     "to_index": ("int", False, None),
+                     "input_features": ("string", False, None),
+                     "output_feature": ("string", True, None),
+                     "lags": ("int", True, 3),
+                     "modelling_type": ("int", True, "trend")}
 
         # Treat inputs
         try:
-            image_path, model_path, file_index_str = self.treat_inputs(request, arguments, created_images)
+            image_path, model_path, file_index_str = self.treat_inputs(request, arguments)
         except HTTPError as e:
             error_message = "Error downloading the input image \n" + e.read()
             log.error(error_message)
@@ -167,7 +145,7 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
 
         with Pool(1) as p:
             try:
-                output = p.apply(_increase_image_resolution, (model_path, image_path))
+                output = p.apply(_detect_causality, (model_path, image_path))
             except Exception as e:
                 log.error(e)
                 self.result.data = e
