@@ -206,8 +206,8 @@ jobs:
     working_directory: ~/singnet
     environment:
       SERVICE_NAME: causality-detection
-      SERVICE_RUN_COMMAND: bash -c "git pull origin ${CIRCLE_BRANCH};cd service/causality-detection/Python_R_wrapper;python3 run_this.py"
-      SERVICE_TEST_COMMAND: bash -c "echo test"
+      SERVICE_RUN_COMMAND: bash -c "git pull origin ${CIRCLE_BRANCH};python3 run_service.py"
+      SERVICE_TEST_COMMAND: bash -c "python3 test_service.py"
     steps:
       - build_command:
           docker_nvidia: true
