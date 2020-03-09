@@ -43,7 +43,7 @@ def _detect_causality(request):
         all_features = input_features.append(output_feature)
         selected_data = data
         selected_data = selected_data.loc[start:end, all_features]
-
+        selected_data.dropna(inplace=True)
         output = granger_causality(selected_data, input_features, output_feature, lags=lags, our_type=modelling_type)
         return output
     except Exception as e:
