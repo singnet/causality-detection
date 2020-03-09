@@ -10,7 +10,7 @@ from multiprocessing import Pool
 import service.service_spec.causality_detection_pb2_grpc as grpc_bt_grpc
 from service.service_spec.causality_detection_pb2 import Result
 
-from granger_causality import granger_causality
+from .granger_causality import granger_causality
 import pandas as pd
 import numpy as np
 import io
