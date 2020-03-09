@@ -19,7 +19,7 @@ if __name__ == "__main__":
         # setting parameters
         grpc_method = "detect_causality"
 
-        data = pd.read_csv('./natural_data2.csv').to_csv()
+        data = pd.read_csv('./Python_R_wrapper/natural_data2.csv').to_csv()
         start = ""
         end = ""
         input_features = "Ozone, WMGHG"
