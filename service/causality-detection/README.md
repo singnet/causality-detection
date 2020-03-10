@@ -13,7 +13,7 @@ One can run this in standard R or RStudio. Required packages: vars, gtools. We c
 
 ## Built With
 
-RStudio, Python
+RStudio
 
 
 ## License

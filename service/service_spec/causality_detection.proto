@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message CausalityDetectionRequest {
+    string data = 1;
+    string start = 2;
+    string end = 3;
+    string input_features = 4;
+    string output_feature = 5;
+    int32 lags = 6;
+    string modelling_type = 7;
+}
+
+message Result {
+    string response = 1;
+}
+
+service CausalityDetection {
+    rpc detect_causality (CausalityDetectionRequest) returns (Result);
+}
