@@ -36,7 +36,8 @@ def _detect_causality(request):
         log.debug("start: {}".format(start))
         end = int(request.end) if request.end != "" else data.shape[0]
         log.debug("end: {}".format(end))
-        input_features = request.input_features.split(',') if request.input_features != "" else data.columns[0:-1]
+        input_features = [feature.strip() for feature in request.input_features.split(',')] \
+            if request.input_features != "" else data.columns[0:-1]
         log.debug("input_features: {}".format(input_features))
         output_feature = request.output_feature if request.output_feature != "" else data.columns[-1]
         log.debug("output_feature: {}".format(output_feature))
@@ -47,7 +48,7 @@ def _detect_causality(request):
         raise e
 
     try:
-        all_features = input_features.append(output_feature)
+        all_features = input_features + [output_feature]
         log.debug("all_features: {}".format(all_features))
         selected_data = data
         selected_data = selected_data.loc[start:end, all_features]
