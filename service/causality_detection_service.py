@@ -48,8 +48,10 @@ def _detect_causality(request):
 
     try:
         all_features = input_features.append(output_feature)
+        log.debug("all_features: {}".format(all_features))
         selected_data = data
         selected_data = selected_data.loc[start:end, all_features]
+        log.debug("selected_data shape: {}".format(selected_data.shape))
         selected_data.dropna(inplace=True)
         log.debug("Data columns: {}".format(selected_data.columns))
         log.debug("Data shape: {}".format(selected_data.shape))
