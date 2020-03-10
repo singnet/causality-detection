@@ -13,6 +13,7 @@ from service.service_spec.causality_detection_pb2 import Result
 from .granger_causality import granger_causality
 import pandas as pd
 import numpy as np
+import rpy2.robjects as robjects
 import io
 
 logging.basicConfig(
@@ -58,7 +59,7 @@ def _detect_causality(request):
         log.debug("Data shape: {}".format(selected_data.shape))
 
         output = granger_causality(selected_data, input_features, output_feature, lags=lags, our_type=modelling_type)
-        common_output = pd.rpy.common.convert_robj(output)
+        common_output = {key: output.rx2(key)[0] for key in output.names}
         log.debug("Output generated: {}. Type: {}".format(common_output, type(common_output)))
         return str(common_output)
     except Exception as e:
