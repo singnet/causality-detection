@@ -67,6 +67,7 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
 
     def detect_causality(self, request, context):
         """Evaluates causality using time series"""
+        log.debug("Received request")
         with Pool(1) as p:
             try:
                 output = p.apply(_detect_causality, (request,))

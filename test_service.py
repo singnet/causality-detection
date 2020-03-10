@@ -31,6 +31,8 @@ if __name__ == "__main__":
         stub = grpc_bt_grpc.CausalityDetectionStub(channel)
         print("Stub created.")
 
+        print("Data type: {}".format(type(data)))
+
         # create a valid request message
         request = grpc_bt_pb2.CausalityDetectionRequest(data=data,
                                                         start=start,
@@ -40,6 +42,7 @@ if __name__ == "__main__":
                                                         lags=lags,
                                                         modelling_type=modelling_type)
         # make the call
+        print("Calling detect causality from test script!")
         output = stub.detect_causality(request)
         print("Response received!")
 
