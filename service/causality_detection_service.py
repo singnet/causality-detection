@@ -27,12 +27,19 @@ def _detect_causality(request):
 
     try:
         data = pd.read_csv(io.StringIO(request.data))
+        log.debug("Input data shape: {}".format(data.shape))
         lags = request.lags if request.lags != 0 else 3
+        log.debug("lags: {}".format(lags))
         modelling_type = request.modelling_type if request.modelling_type != "" else "trend"
+        log.debug("modelling_type: {}".format(modelling_type))
         start = int(request.start) if request.start != "" else 0
+        log.debug("start: {}".format(start))
         end = int(request.end) if request.end != "" else data.shape[0]
+        log.debug("end: {}".format(end))
         input_features = request.input_features.split(',') if request.input_features != "" else data.columns[0:-1]
+        log.debug("input_features: {}".format(input_features))
         output_feature = request.output_feature if request.output_feature != "" else data.columns[-1]
+        log.debug("output_feature: {}".format(output_feature))
 
     except Exception as e:
         log.debug('Error treating input.')
