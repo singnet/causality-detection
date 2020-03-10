@@ -44,6 +44,9 @@ def _detect_causality(request):
         selected_data = data
         selected_data = selected_data.loc[start:end, all_features]
         selected_data.dropna(inplace=True)
+        log.debug("Data columns: {}".format(selected_data.columns))
+        log.debug("Data shape: {}".format(selected_data.shape))
+
         output = granger_causality(selected_data, input_features, output_feature, lags=lags, our_type=modelling_type)
         return output
     except Exception as e:
