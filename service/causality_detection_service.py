@@ -58,6 +58,7 @@ def _detect_causality(request):
         log.debug("Data shape: {}".format(selected_data.shape))
 
         output = granger_causality(selected_data, input_features, output_feature, lags=lags, our_type=modelling_type)
+        log.debug("Output generated: {}. Type: {}".format(output, type(output)))
         return output
     except Exception as e:
         log.debug('Error calling granger_causality.')
