@@ -1,4 +1,4 @@
-# Climate causality
+# Causality detection
 
 This is a project regarding Granger causality. Relevant code can be found here.
 
