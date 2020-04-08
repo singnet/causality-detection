@@ -4,7 +4,6 @@ import service
 import concurrent.futures as futures
 import sys
 import os
-from urllib.error import HTTPError
 from multiprocessing import Pool
 
 import service.service_spec.causality_detection_pb2_grpc as grpc_bt_grpc
@@ -12,8 +11,6 @@ from service.service_spec.causality_detection_pb2 import Result
 
 from .granger_causality import granger_causality
 import pandas as pd
-import numpy as np
-import rpy2.robjects as robjects
 import io
 
 logging.basicConfig(
@@ -42,6 +39,8 @@ def _detect_causality(request):
         log.debug("input_features: {}".format(input_features))
         output_feature = request.output_feature if request.output_feature != "" else data.columns[-1]
         log.debug("output_feature: {}".format(output_feature))
+        list_subcausalities = request.list_subcausalities
+        log.debug("list_subcausalities: {}".format(list_subcausalities))
 
     except Exception as e:
         log.debug('Error treating input.')
@@ -58,7 +57,12 @@ def _detect_causality(request):
         log.debug("Data columns: {}".format(selected_data.columns))
         log.debug("Data shape: {}".format(selected_data.shape))
 
-        output = granger_causality(selected_data, input_features, output_feature, lags=lags, our_type=modelling_type)
+        output = granger_causality(selected_data,
+                                   input_features,
+                                   output_feature,
+                                   lags=lags,
+                                   our_type=modelling_type,
+                                   list_subcausalities=list_subcausalities)
         common_output = str([number for number in output])
         log.debug("Output generated: {}. Type: {}".format(common_output, type(common_output)))
         return str(common_output)
@@ -89,10 +93,16 @@ class CausalityDetectionServicer(grpc_bt_grpc.CausalityDetectionServicer):
                 output = p.apply(_detect_causality, (request,))
                 log.debug("Returning on service complete!")
                 self.result.response = output
+                print("Request's list_subcausalities: {}".format(request.list_subcausalities))
+                if request.list_subcausalities:
+                    self.result.message = "Listing Subcausalities"
+                else:
+                    self.result.message = "Single p-value"
                 return self.result
             except Exception as e:
                 log.error(e)
-                self.result.response = e
+                self.result.response = ""
+                self.result.message = str(e)
                 return self.result
 
 

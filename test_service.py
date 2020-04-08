@@ -26,6 +26,7 @@ if __name__ == "__main__":
         output_feature = "Temperature"
         lags = 3
         modelling_type = ""
+        list_subcausalities = True
 
         # create a stub (client)
         stub = grpc_bt_grpc.CausalityDetectionStub(channel)
@@ -40,7 +41,8 @@ if __name__ == "__main__":
                                                         input_features=input_features,
                                                         output_feature=output_feature,
                                                         lags=lags,
-                                                        modelling_type=modelling_type)
+                                                        modelling_type=modelling_type,
+                                                        list_subcausalities=list_subcausalities)
         # make the call
         print("Calling detect causality from test script!")
         output = stub.detect_causality(request)
@@ -48,7 +50,8 @@ if __name__ == "__main__":
 
         # et voilà
         if output.response:
-            print('Received: {}'.format(output.response))
+            print('Received response: {}'.format(output.response))
+            print('Received message: {}'.format(output.message))
             print("Service completed!")
             exit(0)
         else:
