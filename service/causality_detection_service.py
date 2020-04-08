@@ -12,6 +12,7 @@ from service.service_spec.causality_detection_pb2 import Result
 from .granger_causality import granger_causality
 import pandas as pd
 import io
+import json
 
 logging.basicConfig(
     level=10, format="%(asctime)s - [%(levelname)8s] - %(name)s - %(message)s"
@@ -63,9 +64,17 @@ def _detect_causality(request):
                                    lags=lags,
                                    our_type=modelling_type,
                                    list_subcausalities=list_subcausalities)
-        common_output = str([number for number in output])
-        log.debug("Output generated: {}. Type: {}".format(common_output, type(common_output)))
-        return str(common_output)
+
+        log.debug("Output class: {}".format(output.__class__))
+        if list_subcausalities:
+            output_dict = dict(zip([variables for variables in output[0]], [value for value in output[1]]))
+            log.debug("Converted output generated: {}. Type: {}".format(output_dict, type(output_dict)))
+            return json.dumps(output_dict) # Converts to json and returns string
+        else:
+            log.debug(output)
+            common_output = str([number for number in output])
+            log.debug("Output generated: {}. Type: {}".format(common_output, type(common_output)))
+            return str(common_output)
     except Exception as e:
         log.debug('Error calling granger_causality.')
         log.error(str(e))
