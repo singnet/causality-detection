@@ -27,16 +27,22 @@ def _detect_causality(request):
     try:
         data = pd.read_csv(io.StringIO(request.data))
         log.debug("Input data shape: {}".format(data.shape))
+
         lags = request.lags if request.lags != 0 else 3
         log.debug("lags: {}".format(lags))
+
         modelling_type = request.modelling_type if request.modelling_type != "" else "trend"
         log.debug("modelling_type: {}".format(modelling_type))
+
         start = int(request.start) if request.start != "" else 0
         log.debug("start: {}".format(start))
+
         end = int(request.end) if request.end != "" else data.shape[0]
         log.debug("end: {}".format(end))
+
         input_features = [feature.strip() for feature in request.input_features.split(',')] \
             if request.input_features != "" else data.columns[0:-1]
+
         log.debug("input_features: {}".format(input_features))
         output_feature = request.output_feature if request.output_feature != "" else data.columns[-1]
         log.debug("output_feature: {}".format(output_feature))
@@ -69,12 +75,11 @@ def _detect_causality(request):
         if list_subcausalities:
             output_dict = dict(zip([variables for variables in output[0]], [value for value in output[1]]))
             log.debug("Converted output generated: {}. Type: {}".format(output_dict, type(output_dict)))
-            return json.dumps(output_dict) # Converts to json and returns string
+            return json.dumps(output_dict)  # Converts to json and returns string
         else:
-            log.debug(output)
-            common_output = str([number for number in output])
-            log.debug("Output generated: {}. Type: {}".format(common_output, type(common_output)))
-            return str(common_output)
+            output_dict = {', '.join(input_features): str(output[0])}
+            log.debug("Converted output generated: {}. Type: {}".format(output_dict, type(output_dict)))
+            return json.dumps(output_dict)  # Converts to json and returns string
     except Exception as e:
         log.debug('Error calling granger_causality.')
         log.error(str(e))
