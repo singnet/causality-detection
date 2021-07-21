@@ -17,7 +17,7 @@ jobs:
           run-command: "python3 run_service.py --ssl"
           docker-test-files: "Dockerfile, requirements.txt"
           docker-file-path: "Dockerfile"
-          docker-no-cache: ${DOCKER_NOCACHE}
+          docker-no-cache: true
           docker-image: "causality_detection"
           docker-container: "CAUSALITY_DETECTION"
           docker-nvidia: true
